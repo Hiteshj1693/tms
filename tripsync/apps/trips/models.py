@@ -22,10 +22,12 @@ class Trip(models.Model):
     trip_destination = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
-    trip_visibility = models.CharField(max_length=10,choices=VISIBILITY_CHOICES, default='private')
+    trip_visibility = models.CharField(max_length=10,choices=VISIBILITY_CHOICES, default='public')
     trip_image = models.ImageField(upload_to='trip_images/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    
 
     def clean(self):
         if self.end_date < self.start_date:

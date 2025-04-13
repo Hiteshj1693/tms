@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'rest_framework.authtoken',
     'django_celery_beat',
     'channels',
     'guardian',
@@ -120,7 +121,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "tripsync",
         "USER": "postgres",
-        "PASSWORD": "hitesh123",
+        "PASSWORD": "1111",
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }
@@ -189,6 +190,16 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # <- should be this
+    ],
+    # ... other settings
+    
+}
 
 # CELERY Implementation
 
@@ -201,3 +212,13 @@ CELERY_RESULTS_BACKEND = "redis://localhost:6379/0"
 
 
 # CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+}
