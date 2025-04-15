@@ -22,4 +22,5 @@ urlpatterns = [
     path('users/',include('apps.users.urls')),
     path('trips/',include('apps.trips.urls')),
     path('auth/', include('apps.authentication.urls')),  # Includ
+    path('polls/',include('apps.polls.urls')),
 ]
