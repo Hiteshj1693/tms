@@ -16,3 +16,4 @@ class IsAdminOrTripParticipant(permissions.BasePermission):
             request.user == obj.trip_organizer or
             request.user in obj.participants.all()
         )
+    

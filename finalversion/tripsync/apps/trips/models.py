@@ -98,6 +98,7 @@ class TripJoinRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=[('pending','Pending'),('approved','Approved'),('rejected','Rejected')],default='pending')
+    invited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_trip_invites')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

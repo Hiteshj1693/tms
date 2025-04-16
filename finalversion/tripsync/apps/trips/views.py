@@ -70,3 +70,135 @@ class TripParticipantViewSet(viewsets.ModelViewSet):
     serializer_class = TripParticipantSerializer
     permission_classes = [IsAuthenticated]
 
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def respond_to_join_request(request, request_id):
+    try:
+        join_request = TripJoinRequest.objects.get(id=request_id, user=request.user)
+
+        if join_request.status != "pending":
+            return Response({"error": "Request already processed"}, status=400)
+
+        action = request.data.get("action")  # 'accept' or 'reject'
+
+        if action == "accept":
+            join_request.status = "approved"
+            TripParticipant.objects.create(user=request.user, trip=join_request.trip)
+        elif action == "reject":
+            join_request.status = "rejected"
+        else:
+            return Response({"error": "Invalid action"}, status=400)
+
+        join_request.save()
+        return Response({"message": f"Request {action}ed successfully."})
+
+    except TripJoinRequest.DoesNotExist:
+        return Response({"error": "Request not found"}, status=404)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def respond_to_join_request(request, request_id):
+    try:
+        join_request = TripJoinRequest.objects.get(id=request_id, user=request.user)
+
+        if join_request.status != "pending":
+            return Response({"error": "Request already processed"}, status=400)
+
+        action = request.data.get("action")  # 'accept' or 'reject'
+
+        if action == "accept":
+            join_request.status = "approved"
+            TripParticipant.objects.create(user=request.user, trip=join_request.trip)
+        elif action == "reject":
+            join_request.status = "rejected"
+        else:
+            return Response({"error": "Invalid action"}, status=400)
+
+        join_request.save()
+        return Response({"message": f"Request {action}ed successfully."})
+
+    except TripJoinRequest.DoesNotExist:
+        return Response({"error": "Request not found"}, status=404)
+
+
+def send_email_to_user(email, trip, join_request):
+    # This is just a mock. Integrate with Django Email backend
+    subject = f"Invitation to join Trip: {trip.trip_title}"
+    accept_url = f"http://yourfrontend.com/trip/join/{join_request.id}/?action=accept"
+    reject_url = f"http://yourfrontend.com/trip/join/{join_request.id}/?action=reject"
+    body = f"""
+    You have been invited to join the trip: {trip.trip_title}.
+    
+    Message from inviter: {join_request.message}
+
+    Accept: {accept_url}
+    Reject: {reject_url}
+    """
+    print(f"Send email to {email}:\n{body}")
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Can be changed to token-based for secure APIs
+def trip_join_response(request, request_id):
+    action = request.GET.get('action')  # 'accept' or 'reject'
+    try:
+        join_request = TripJoinRequest.objects.get(id=request_id)
+
+        if join_request.status != "pending":
+            return Response({"message": "Request already processed."})
+
+        if action == "accept":
+            TripParticipant.objects.create(user=join_request.user, trip=join_request.trip)
+            join_request.status = "approved"
+        elif action == "reject":
+            join_request.status = "rejected"
+        else:
+            return Response({"error": "Invalid action"}, status=400)
+
+        join_request.save()
+        return Response({"message": f"Successfully {action}ed the trip invitation."})
+
+    except TripJoinRequest.DoesNotExist:
+        return Response({"error": "Join request not found"}, status=404)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def trip_join_response(request, request_id):
+    action = request.GET.get('action')
+    try:
+        join_request = TripJoinRequest.objects.get(id=request_id)
+
+        if join_request.status != "pending":
+            return Response({"message": "Request already processed."})
+
+        if action == "accept":
+            # Add to TripParticipant
+            TripParticipant.objects.create(user=join_request.user, trip=join_request.trip)
+
+            # Add to TripUserRelation with role as 'participant'
+            TripUserRelation.objects.create(
+                trip_id=join_request.trip,
+                user_id=join_request.user,
+                user_role='participant'
+            )
+
+            join_request.status = "approved"
+
+        elif action == "reject":
+            join_request.status = "rejected"
+        else:
+            return Response({"error": "Invalid action"}, status=400)
+
+        join_request.save()
+        return Response({"message": f"Successfully {action}ed the trip invitation."})
+
+    except TripJoinRequest.DoesNotExist:
+        return Response({"error": "Join request not found"}, status=404)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
