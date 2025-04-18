@@ -42,25 +42,25 @@ def send_welcome_mail(sender, instance, created, **kwargs):
         )
 
 
-@receiver(post_save, sender=User)
-def update_role_on_registration(sender, instance, created, **kwargs):
-    if created:
-        instance.role = "viewer"
-        instance.save()
+# @receiver(post_save, sender=User)
+# def update_role_on_registration(sender, instance, created, **kwargs):
+#     if created:
+#         instance.role = "viewer"
+#         instance.save()
 
 
-#
+# #
 
 
-@receiver(post_save, sender=Trip)
-def update_role_on_trip_creation(sender, instance, created, **kwargs):
-    if created:
-        # instance.trip_organizer.role = "trip_admin"
-        # instance.trip_organizer.save()
-        trip_user_relation = TripUserRelation(
-            trip_id=instance, user_id=instance.trip_organizer, user_role="trip_admin"
-        )
-        trip_user_relation.save()
+# @receiver(post_save, sender=Trip)
+# def update_role_on_trip_creation(sender, instance, created, **kwargs):
+#     if created:
+#         # instance.trip_organizer.role = "trip_admin"
+#         # instance.trip_organizer.save()
+#         trip_user_relation = TripUserRelation(
+#             trip_id=instance, user_id=instance.trip_organizer, user_role="trip_admin"
+#         )
+#         trip_user_relation.save()
 
 
 # @receiver(post_save, sender= Trip)

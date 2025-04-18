@@ -188,7 +188,7 @@ class Trip(models.Model):
     trip_participants = models.ManyToManyField(
         User, related_name="joined_trips", blank=True
     )
-
+    
     def clean(self):
         if self.end_date < self.start_date:
             raise ValidationError(
